@@ -64,18 +64,25 @@ def responder_mensaje(remitente, mensaje):
     if remitente in clientes_en_espera:
         return None  
 
-    # Buscar si es una consulta predefinida
-    for clave, respuesta in RESPUESTAS_PREDEFINIDAS.items():
-        if clave in mensaje.lower():
-            return respuesta
+    # Temporalmente, desactivamos Tienda Nube si no está configurada
+    if "TIENDA_NUBE_ACCESS_TOKEN" not in globals() or not TIENDA_NUBE_ACCESS_TOKEN:
+        print("⚠ Tienda Nube no está configurada. Respondiendo con mensaje por defecto.")
+        return "🤖 Lo siento, la consulta sobre productos aún no está disponible."
 
-    # Si no es consulta predefinida, buscar en Tienda Nube
-    respuesta_producto = buscar_producto(mensaje)
-    if respuesta_producto:
-        return respuesta_producto
+    # Temporalmente, desactivamos GPT-4 si no está configurado
+    if "OPENAI_API_KEY" not in globals() or not OPENAI_API_KEY:
+        print("⚠ GPT-4 no está configurado. Respondiendo con mensaje por defecto.")
+        return "🤖 Lo siento, aún no puedo responder preguntas generales."
 
-    # Si no se encuentra nada, consulta GPT-4
-    return consultar_gpt(mensaje)
+    # Si ya tienes Tienda Nube configurado, puedes activar esta línea más adelante:
+    # respuesta_producto = buscar_producto(mensaje)
+    # if respuesta_producto:
+    #     return respuesta_producto
+
+    # Si ya tienes GPT-4 configurado, puedes activar esta línea más adelante:
+    # return consultar_gpt(mensaje)
+
+    return "🤖 No entendí tu consulta. ¿Puedes reformularla?"
 
 # Webhook de WhatsApp
 @app.route("/webhook", methods=["GET", "POST"])
