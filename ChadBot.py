@@ -106,5 +106,9 @@ def enviar_mensaje(destinatario, mensaje):
     }
     requests.post(url, json=payload, headers=headers)
 
+import os
+
 if __name__ == "__main__":
-    app.run(port=5000)
+    port = int(os.environ.get("PORT", 5000))  # Usa el puerto asignado por Render
+    app.run(host="0.0.0.0", port=port)  # Escucha en todas las interfaces
+
