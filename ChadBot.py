@@ -89,19 +89,32 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-@app.route("/webhook", methods=["POST"])
+VERIFY_TOKEN = "mi-token-de-verificación"  # Usa el mismo que configuraste en Meta
+
+@app.route("/webhook", methods=["GET", "POST"])
 def webhook():
-    print("📩 Se recibió un POST en /webhook")  # Solo para confirmar que la solicitud llega
+    if request.method == "GET":  # Manejo de validación de Webhook en Meta
+        mode = request.args.get("hub.mode")
+        token = request.args.get("hub.verify_token")
+        challenge = request.args.get("hub.challenge")
 
-    try:
-        raw_data = request.data  # Obtener datos sin procesar
-        print(f"📩 Datos crudos recibidos: {raw_data}")  # Mostrar cualquier dato recibido
+        if mode == "subscribe" and token == VERIFY_TOKEN:
+            print("✅ Webhook verificado correctamente.")
+            return challenge, 200
+        else:
+            print("❌ Fallo en la verificación del Webhook.")
+            return "Error de verificación", 403
 
-        return "OK", 200
+    if request.method == "POST":  # Manejo de mensajes entrantes
+        print("📩 Se recibió un POST en /webhook")
+        try:
+            raw_data = request.data
+            print(f"📩 Datos crudos recibidos: {raw_data}")  # Mostrar cualquier dato recibido
+            return "OK", 200
+        except Exception as e:
+            print(f"❌ Error al procesar la solicitud: {str(e)}")
+            return "Error", 500
 
-    except Exception as e:
-        print(f"❌ Error al procesar la solicitud: {str(e)}")
-        return "Error", 500
 
 # Función para enviar mensajes de WhatsApp
 def enviar_mensaje(destinatario, mensaje):
