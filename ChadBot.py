@@ -86,28 +86,21 @@ def responder_mensaje(remitente, mensaje):
 
 # Webhook de WhatsApp
 from flask import Flask, request
-import json
 
 app = Flask(__name__)
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
+    print("📩 Se recibió un POST en /webhook")  # Solo para confirmar que la solicitud llega
+
     try:
-        data = request.get_json()  # Obtener los datos en formato JSON
-        
-        # Si no hay datos, imprimir un mensaje de error
-        if not data:
-            print("⚠ No se recibieron datos desde WhatsApp.")
-            return "No data received", 400
-        
-        # Imprimir los datos en Render para depuración
-        print("📩 Datos recibidos desde WhatsApp:")
-        print(json.dumps(data, indent=2))  # Mostrar JSON bien estructurado en logs
+        raw_data = request.data  # Obtener datos sin procesar
+        print(f"📩 Datos crudos recibidos: {raw_data}")  # Mostrar cualquier dato recibido
 
         return "OK", 200
 
     except Exception as e:
-        print(f"❌ Error al procesar los datos: {str(e)}")
+        print(f"❌ Error al procesar la solicitud: {str(e)}")
         return "Error", 500
 
 # Función para enviar mensajes de WhatsApp
