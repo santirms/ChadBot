@@ -92,13 +92,23 @@ app = Flask(__name__)
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    data = request.get_json()  # Obtener datos en formato JSON
-    
-    # Imprimir los datos recibidos en los logs de Render
-    print("📩 Datos recibidos desde WhatsApp:")
-    print(json.dumps(data, indent=2))  # Mostrar JSON bien estructurado en logs
+    try:
+        data = request.get_json()  # Obtener los datos en formato JSON
+        
+        # Si no hay datos, imprimir un mensaje de error
+        if not data:
+            print("⚠ No se recibieron datos desde WhatsApp.")
+            return "No data received", 400
+        
+        # Imprimir los datos en Render para depuración
+        print("📩 Datos recibidos desde WhatsApp:")
+        print(json.dumps(data, indent=2))  # Mostrar JSON bien estructurado en logs
 
-    return "OK", 200
+        return "OK", 200
+
+    except Exception as e:
+        print(f"❌ Error al procesar los datos: {str(e)}")
+        return "Error", 500
 
 # Función para enviar mensajes de WhatsApp
 def enviar_mensaje(destinatario, mensaje):
