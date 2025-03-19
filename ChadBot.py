@@ -12,7 +12,7 @@ TIENDA_NUBE_API_URL = f"https://api.tiendanube.com/v1/{TIENDA_NUBE_STORE_ID}/pro
 # Credenciales de WhatsApp Cloud API
 import os
 
-WHATSAPP_TOKEN = os.environ.get("EAAHz1wFDZCQABOxZCWHVRs0XdkSrCaKLbvHyS2ABw3tnnZBtgG4fLE4houMZBUiaxMiXUoLsvCOyycuXiSmAMM32Wk2auVWXJikqOAwhOSjdT4ZChdYUYabKzic9aLjk2JV12vmUfw9MEsqwwF3hYzswZCnEsKwwKZChbDxjbgmkRB1zThymTxK3WH4XcmrUZBEGgOGtzAZDZD")
+WHATSAPP_TOKEN = os.environ.get("WHATSAPP_TOKEN")
 VERIFY_TOKEN = os.environ.get("mi-token-de-verificación")
 
 # Credenciales de OpenAI GPT-4
