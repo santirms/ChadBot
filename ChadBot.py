@@ -91,37 +91,49 @@ app = Flask(__name__)
 
 VERIFY_TOKEN = "mi-token-de-verificación"
 
-@app.route("/webhook", methods=["GET", "POST"])
+@app.route("/webhook", methods=["POST"])
 def webhook():
-    if request.method == "GET":
-        mode = request.args.get("hub.mode")
-        token = request.args.get("hub.verify_token")
-        challenge = request.args.get("hub.challenge")
+    print("📩 Se recibió un POST en /webhook")
 
-        if mode == "subscribe" and token == VERIFY_TOKEN:
-            print("✅ Webhook verificado correctamente.")
-            return challenge, 200
-        else:
-            print("❌ Fallo en la verificación del Webhook.")
-            return "Error de verificación", 403
+    try:
+        raw_data = request.data  # Obtener datos en crudo
+        json_data = request.get_json(silent=True)  # Intentar convertir a JSON
 
-    if request.method == "POST":
-        print("📩 Se recibió un POST en /webhook")
-        
-        try:
-            raw_data = request.data  # Obtener datos en crudo
-            json_data = request.get_json(silent=True)  # Intentar convertir a JSON
+        print(f"📩 Datos crudos recibidos: {raw_data}")  # Mostrar cualquier dato recibido
+        if json_data:
+            print(f"📩 Datos en JSON: {json_data}")  # Ver el JSON estructurado
+            
+            # Obtener el mensaje y el número de teléfono del remitente
+            if "messages" in json_data["entry"][0]["changes"][0]["value"]:
+                mensaje = json_data["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
+                remitente = json_data["entry"][0]["changes"][0]["value"]["messages"][0]["from"]
+                
+                print(f"📩 Mensaje recibido: {mensaje} de {remitente}")
 
-            print(f"📩 Datos crudos recibidos: {raw_data}")  # Mostrar cualquier dato recibido
-            if json_data:
-                print(f"📩 Datos en JSON: {json_data}")  # Ver el JSON estructurado
-            else:
-                print("⚠ No se recibió JSON válido en el POST.")
+                # Responder al usuario
+                respuesta = {
+                    "messaging_product": "whatsapp",
+                    "to": remitente,
+                    "type": "text",
+                    "text": {"body": "¡Hola! Recibí tu mensaje: " + mensaje}
+                }
 
-            return "OK", 200
-        except Exception as e:
-            print(f"❌ Error al procesar la solicitud: {str(e)}")
-            return "Error", 500
+                # Enviar la respuesta
+                requests.post(
+                    "https://graph.facebook.com/v18.0/549579741461760/messages",
+                    headers={
+                        "Authorization": f"Bearer {EAAHz1wFDZCQABOxZCWHVRs0XdkSrCaKLbvHyS2ABw3tnnZBtgG4fLE4houMZBUiaxMiXUoLsvCOyycuXiSmAMM32Wk2auVWXJikqOAwhOSjdT4ZChdYUYabKzic9aLjk2JV12vmUfw9MEsqwwF3hYzswZCnEsKwwKZChbDxjbgmkRB1zThymTxK3WH4XcmrUZBEGgOGtzAZDZD}",
+                        "Content-Type": "application/json"
+                    },
+                    json=respuesta
+                )
+                print(f"✅ Mensaje enviado a {remitente}")
+
+        return "OK", 200
+
+    except Exception as e:
+        print(f"❌ Error al procesar la solicitud: {str(e)}")
+        return "Error", 500
 
 # Función para enviar mensajes de WhatsApp
 def enviar_mensaje(destinatario, mensaje):
