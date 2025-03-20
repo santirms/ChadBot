@@ -91,9 +91,12 @@ app = Flask(__name__)
 
 VERIFY_TOKEN = "mi-token-de-verificación"
 
+import sys
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     print("📩 Se recibió un POST en /webhook")
+    sys.stdout.flush()  # Forzar que se muestre en Render
 
     try:
         raw_data = request.data
@@ -101,11 +104,14 @@ def webhook():
 
         print(f"📩 Datos crudos recibidos: {raw_data}")
         print(f"📩 JSON recibido: {json_data}")
+        sys.stdout.flush()  # Asegurar que Render imprima el log
 
         return "OK", 200
     except Exception as e:
         print(f"❌ Error al procesar la solicitud: {str(e)}")
+        sys.stdout.flush()  
         return "Error", 500
+
 
 # Función para enviar mensajes de WhatsApp
 def enviar_mensaje(destinatario, mensaje):
