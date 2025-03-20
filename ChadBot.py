@@ -96,41 +96,13 @@ def webhook():
     print("📩 Se recibió un POST en /webhook")
 
     try:
-        raw_data = request.data  # Obtener datos en crudo
-        json_data = request.get_json(silent=True)  # Intentar convertir a JSON
+        raw_data = request.data
+        json_data = request.get_json(silent=True)
 
-        print(f"📩 Datos crudos recibidos: {raw_data}")  # Mostrar cualquier dato recibido
-        if json_data:
-            print(f"📩 Datos en JSON: {json_data}")  # Ver el JSON estructurado
-            
-            # Obtener el mensaje y el número de teléfono del remitente
-            if "messages" in json_data["entry"][0]["changes"][0]["value"]:
-                mensaje = json_data["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
-                remitente = json_data["entry"][0]["changes"][0]["value"]["messages"][0]["from"]
-                
-                print(f"📩 Mensaje recibido: {mensaje} de {remitente}")
-
-                # Responder al usuario
-                respuesta = {
-                    "messaging_product": "whatsapp",
-                    "to": remitente,
-                    "type": "text",
-                    "text": {"body": "¡Hola! Recibí tu mensaje: " + mensaje}
-                }
-
-                # Enviar la respuesta
-                requests.post(
-                    "https://graph.facebook.com/v18.0/549579741461760/messages",
-                    headers={
-                        "Authorization": f"Bearer {EAAHz1wFDZCQABOxZCWHVRs0XdkSrCaKLbvHyS2ABw3tnnZBtgG4fLE4houMZBUiaxMiXUoLsvCOyycuXiSmAMM32Wk2auVWXJikqOAwhOSjdT4ZChdYUYabKzic9aLjk2JV12vmUfw9MEsqwwF3hYzswZCnEsKwwKZChbDxjbgmkRB1zThymTxK3WH4XcmrUZBEGgOGtzAZDZD}",
-                        "Content-Type": "application/json"
-                    },
-                    json=respuesta
-                )
-                print(f"✅ Mensaje enviado a {remitente}")
+        print(f"📩 Datos crudos recibidos: {raw_data}")
+        print(f"📩 JSON recibido: {json_data}")
 
         return "OK", 200
-
     except Exception as e:
         print(f"❌ Error al procesar la solicitud: {str(e)}")
         return "Error", 500
