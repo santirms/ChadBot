@@ -123,7 +123,6 @@ def webhook():
         print(f"📩 JSON recibido: {json_data}")
         sys.stdout.flush()
 
-        # Verificar si hay un mensaje en la estructura JSON
         if "messages" in json_data["entry"][0]["changes"][0]["value"]:
             mensaje = json_data["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
             remitente = json_data["entry"][0]["changes"][0]["value"]["messages"][0]["from"]
@@ -131,10 +130,18 @@ def webhook():
             print(f"📩 Mensaje recibido: {mensaje} de {remitente}")
             sys.stdout.flush()
 
-            # Enviar respuesta automática
-            enviar_respuesta(remitente, f"¡Hola! Recibí tu mensaje: {mensaje}")
+            # Procesar la respuesta según la pregunta
+            respuesta = procesar_mensaje(mensaje)
+
+            # Enviar la respuesta
+            enviar_respuesta(remitente, respuesta)
 
         return "OK", 200
+
+    except Exception as e:
+        print(f"❌ Error al procesar la solicitud: {str(e)}")
+        sys.stdout.flush()
+        return "Error", 500
 
     except Exception as e:
         print(f"❌ Error al procesar la solicitud: {str(e)}")
