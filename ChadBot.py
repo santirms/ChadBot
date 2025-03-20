@@ -130,13 +130,19 @@ def webhook():
             print(f"📩 Mensaje recibido: {mensaje} de {remitente}")
             sys.stdout.flush()
 
-            # Procesar la respuesta según la pregunta
-            respuesta = procesar_mensaje(mensaje)
+            # Llamar a la función correcta (antes llamaba a procesar_mensaje)
+            respuesta = responder_mensaje(remitente, mensaje)
 
-            # Enviar la respuesta
-            enviar_respuesta(remitente, respuesta)
+            # Si la respuesta no es None, enviarla
+            if respuesta:
+                enviar_respuesta(remitente, respuesta)
 
         return "OK", 200
+
+    except Exception as e:
+        print(f"❌ Error al procesar la solicitud: {str(e)}")
+        sys.stdout.flush()
+        return "Error", 500
 
     except Exception as e:
         print(f"❌ Error al procesar la solicitud: {str(e)}")
