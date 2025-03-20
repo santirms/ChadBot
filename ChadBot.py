@@ -93,37 +93,58 @@ VERIFY_TOKEN = "mi-token-de-verificación"
 
 import sys
 
+import requests
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     print("📩 Se recibió un POST en /webhook")
-    sys.stdout.flush()  # Forzar que se muestre en Render
+    sys.stdout.flush()
 
     try:
         raw_data = request.data
         json_data = request.get_json(silent=True)
 
-        print(f"📩 Datos crudos recibidos: {raw_data}")
         print(f"📩 JSON recibido: {json_data}")
-        sys.stdout.flush()  # Asegurar que Render imprima el log
+        sys.stdout.flush()
+
+        # Verificar si hay un mensaje en la estructura JSON
+        if "messages" in json_data["entry"][0]["changes"][0]["value"]:
+            mensaje = json_data["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
+            remitente = json_data["entry"][0]["changes"][0]["value"]["messages"][0]["from"]
+            
+            print(f"📩 Mensaje recibido: {mensaje} de {remitente}")
+            sys.stdout.flush()
+
+            # Enviar respuesta automática
+            enviar_respuesta(remitente, f"¡Hola! Recibí tu mensaje: {mensaje}")
 
         return "OK", 200
+
     except Exception as e:
         print(f"❌ Error al procesar la solicitud: {str(e)}")
-        sys.stdout.flush()  
+        sys.stdout.flush()
         return "Error", 500
 
 
 # Función para enviar mensajes de WhatsApp
-def enviar_mensaje(destinatario, mensaje):
-    url = "https://graph.facebook.com/v18.0/me/messages"
-    headers = {"Authorization": f"Bearer {WHATSAPP_TOKEN}", "Content-Type": "application/json"}
-    payload = {
-        "messaging_product": "whatsapp",
-        "to": destinatario,
-        "type": "text",
-        "text": {"body": mensaje},
+def enviar_respuesta(numero, mensaje):
+    url = "https://graph.facebook.com/v18.0/602432446282342/messages"  # Reemplazar con tu Phone Number ID
+    headers = {
+        "Authorization": f"Bearer EAAHz1wFDZCQABOxZCWHVRs0XdkSrCaKLbvHyS2ABw3tnnZBtgG4fLE4houMZBUiaxMiXUoLsvCOyycuXiSmAMM32Wk2auVWXJikqOAwhOSjdT4ZChdYUYabKzic9aLjk2JV12vmUfw9MEsqwwF3hYzswZCnEsKwwKZChbDxjbgmkRB1zThymTxK3WH4XcmrUZBEGgOGtzAZDZD",
+        "Content-Type": "application/json"
     }
-    requests.post(url, json=payload, headers=headers)
+    data = {
+        "messaging_product": "whatsapp",
+        "to": numero,
+        "type": "text",
+        "text": {"body": mensaje}
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+
+    print(f"✅ Respuesta enviada a {numero}: {mensaje}")
+    print(f"📩 Respuesta API: {response.json()}")
+    sys.stdout.flush()
 
 import os
 
