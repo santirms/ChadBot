@@ -55,6 +55,9 @@ def responder_mensaje(remitente, mensaje):
         "hola": "Hola! Gracias por comunicarte con Igeneration Tech Store ¿En que te puedo ayudar?",
         "medios de pago": "Aceptamos pagos con transferencia bancaria con un -10% de descuento, MercadoPago, MODO, tarjetas de debito y credito con hasta 6 cuotas sin interés en todo el sitio!",
         "tarjetas": "Si! Aceptamos todas las tarjetas de credito, podés pagar en hasta 6 cuotas sin interés",
+        "local": "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
+        "ubicacion": "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
+        "ubicados" : "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
         "ubicación": "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
         "retirar": "Sí, puedes retirar tu compra por nuestro local en el Boulevard Shopping, Adrogué. Te avisaremos en cuanto esté lista.",
         "envíos": "Sí, realizamos envíos a todo el país por Correo Argentino o Andreani. Para CABA y GBA tenemos envío gratis con nuestra logística.",
@@ -64,6 +67,8 @@ def responder_mensaje(remitente, mensaje):
         "tv box": "Tenemos varios modelos con Android oficial para usar aplicaciones como Netflix, Prime, Max con suscripción. También tenemos genéricos con acceso a series y películas. Te dejo el link para que los puedas ver: https://igeneration.com.ar/media-streaming/?mpage=2",
         "garantía": "Todos nuestros productos tienen garantía de 6 o 12 meses por fallas de fábrica.",
         "cuotas": "Sí, puedes pagar con tarjeta en hasta 6 cuotas sin interés.",
+        "gracias": "Gracias a vos! Espero haberte ayudado con la consulta",
+        "mouse": "Si, te paso el link con los modelos disponibles https://igeneration.com.ar/perifericos/mouses/",
         "cbu": "Te paso los datos para realizar la transferencia por tu pedido. Alias: igeneration.galicia - CUIT 30717295362 - Titular: Igeneration SRL."
     }
 
