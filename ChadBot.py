@@ -75,7 +75,7 @@ def responder_mensaje(remitente, mensaje):
     # Si el cliente pide atención humana
     if mensaje in ["humano", "quiero hablar con alguien", "necesito ayuda"]:
         clientes_en_espera.add(remitente)
-        return "🧑‍💼 Te pondremos en contacto con un asesor en breve."
+        return "🧑‍💼 Hace click en el enlace https://wa.me/5491153876227 y te pondremos en contacto con un asesor comercial en breve."
 
     # Si el cliente está en espera de atención humana, no responde automáticamente
     if remitente in clientes_en_espera:
@@ -166,8 +166,12 @@ def webhook():
 
 # Función para enviar mensajes de WhatsApp
 
+import time
+
 def enviar_respuesta(numero, mensaje):
-    url = "https://graph.facebook.com/v18.0/602432446282342/messages"  # Reemplazar con tu Phone Number ID
+    time.sleep(1)  # Agrega una pausa de 1 segundo antes de responder
+
+    url = "https://graph.facebook.com/v18.0/602432446282342/messages"
     headers = {
         "Authorization": f"Bearer EAAHz1wFDZCQABOxZCWHVRs0XdkSrCaKLbvHyS2ABw3tnnZBtgG4fLE4houMZBUiaxMiXUoLsvCOyycuXiSmAMM32Wk2auVWXJikqOAwhOSjdT4ZChdYUYabKzic9aLjk2JV12vmUfw9MEsqwwF3hYzswZCnEsKwwKZChbDxjbgmkRB1zThymTxK3WH4XcmrUZBEGgOGtzAZDZD",
         "Content-Type": "application/json"
@@ -184,6 +188,7 @@ def enviar_respuesta(numero, mensaje):
     print(f"✅ Respuesta enviada a {numero}: {mensaje}")
     print(f"📩 Respuesta API: {response.json()}")
     sys.stdout.flush()
+
 
 import os
 
