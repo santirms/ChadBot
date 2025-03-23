@@ -52,7 +52,7 @@ def responder_mensaje(remitente, mensaje):
     # Diccionario de respuestas personalizadas
     RESPUESTAS = {
         "horarios": "Nuestro horario de atención es de lunes a jueves de 10:30 a 21:00 hs, viernes y sábados de 10:30 a 22:00 hs.",
-        "hola": "Hola! Gracias por comunicarte con Igeneration Tech Store ¿En que te puedo ayudar?",
+        "hola": "Hola! ¿Cómo estas? Gracias por comunicarte con Igeneration Tech Store ¿En que te puedo ayudar?",
         "medios de pago": "Aceptamos pagos con transferencia bancaria con un -10% de descuento, MercadoPago, MODO, tarjetas de debito y credito con hasta 6 cuotas sin interés en todo el sitio!",
         "tarjetas": "Si! Aceptamos todas las tarjetas de credito, podes pagar en hasta 6 cuotas sin interés",
         "local": "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
