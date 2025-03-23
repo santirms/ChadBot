@@ -66,7 +66,7 @@ def responder_mensaje(remitente, mensaje):
         "productos": "Tenemos una gran variedad de productos de tecnología y realidad virtual. ¿Buscas algo en particular?",
         "tv box": "Tenemos varios modelos con Android oficial para usar aplicaciones como Netflix, Prime, Max con suscripción. También tenemos genéricos con acceso a series y películas. Te dejo el link para que los puedas ver: https://igeneration.com.ar/media-streaming/?mpage=2",
         "garantía": "Todos nuestros productos tienen garantía de 6 o 12 meses por fallas de fábrica.",
-        "conversor": ""Tenemos varios modelos con Android oficial para usar aplicaciones como Netflix, Prime, Max con suscripción. También tenemos genéricos con acceso a series y películas. Te dejo el link para que los puedas ver: https://igeneration.com.ar/media-streaming/?mpage=2",
+        "conversor": "Tenemos varios modelos con Android oficial para usar aplicaciones como Netflix, Prime, Max con suscripción. También tenemos genéricos con acceso a series y películas. Te dejo el link para que los puedas ver: https://igeneration.com.ar/media-streaming/?mpage=2",
         "cuotas": "Sí, podes pagar con tarjeta en hasta 6 cuotas sin interés.",
         "gracias": "Gracias a vos! Espero haberte ayudado con la consulta",
         "auriculares": "Si, te paso el link con los modelos disponibles https://igeneration.com.ar/audio/auriculares/?mpage=3",
@@ -172,7 +172,7 @@ def webhook():
 import time
 
 def enviar_respuesta(numero, mensaje):
-    time.sleep(1)  # Agrega una pausa de 1 segundo antes de responder
+    time.sleep(2)  # Agrega una pausa de 2 segundos antes de responder
 
     url = "https://graph.facebook.com/v18.0/602432446282342/messages"
     headers = {
