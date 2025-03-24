@@ -1,5 +1,8 @@
 import requests
 import openai
+import os
+import time
+import sys
 from flask import Flask, request
 
 app = Flask(__name__)
@@ -10,13 +13,12 @@ TIENDA_NUBE_ACCESS_TOKEN = "TU_ACCESS_TOKEN"
 TIENDA_NUBE_API_URL = f"https://api.tiendanube.com/v1/{TIENDA_NUBE_STORE_ID}/products"
 
 # Credenciales de WhatsApp Cloud API
-import os
-
 WHATSAPP_TOKEN = os.environ.get("WHATSAPP_TOKEN")
 VERIFY_TOKEN = os.environ.get("mi-token-de-verificación")
 
 # Credenciales de OpenAI GPT-4
-OPENAI_API_KEY = "TU_OPENAI_API_KEY"
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+openai.api_key = OPENAI_API_KEY
 
 # Clientes en espera de atención humana
 clientes_en_espera = set()
@@ -26,30 +28,19 @@ def buscar_producto(nombre_producto):
     headers = {"Authentication": f"Bearer {TIENDA_NUBE_ACCESS_TOKEN}"}
     response = requests.get(TIENDA_NUBE_API_URL, headers=headers)
     productos = response.json()
-    
+
     for producto in productos:
         if nombre_producto.lower() in producto["name"].lower():
             return f"📦 {producto['name']}\n💰 Precio: ${producto['price']}\n📦 Stock: {producto['stock']}\n🔗 {producto['permalink']}"
 
     return None  # No se encontró el producto
 
-# Función para consultar GPT-4 si la pregunta no es un producto ni una respuesta predefinida
-def consultar_gpt(mensaje):
-    openai.api_key = OPENAI_API_KEY
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "system", "content": "Eres un asistente de ventas de una tienda de tecnología."},
-                  {"role": "user", "content": mensaje}]
-    )
-    return response["choices"][0]["message"]["content"]
-
 # Función para manejar los mensajes
 def responder_mensaje(remitente, mensaje):
     global clientes_en_espera
 
-    mensaje = mensaje.lower()  # Convertir mensaje a minúsculas para comparación
+    mensaje = mensaje.lower()
 
-    # Diccionario de respuestas personalizadas
     RESPUESTAS = {
         "horarios": "Nuestro horario de atención es de lunes a jueves de 10:30 a 21:00 hs, viernes y sábados de 10:30 a 22:00 hs.",
         "hola": "Hola! ¿Cómo estas? Gracias por comunicarte con Igeneration Tech Store ¿En que te puedo ayudar?",
@@ -57,7 +48,7 @@ def responder_mensaje(remitente, mensaje):
         "tarjetas": "Si! Aceptamos todas las tarjetas de credito, podes pagar en hasta 6 cuotas sin interés",
         "local": "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
         "ubicacion": "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
-        "ubicados" : "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
+        "ubicados": "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
         "ubicación": "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
         "retirar": "Sí, podes retirar tu compra por nuestro local en el Boulevard Shopping, Adrogué. Te avisaremos en cuanto esté lista.",
         "envíos": "Sí, realizamos envíos a todo el país por Correo Argentino o Andreani. Para CABA y GBA tenemos envío gratis con nuestra logística.",
@@ -75,53 +66,31 @@ def responder_mensaje(remitente, mensaje):
         "cbu": "Te paso los datos para realizar la transferencia por tu pedido. Alias: igeneration.galicia - CUIT 30717295362 - Titular: Igeneration SRL."
     }
 
-    # Si el cliente pide atención humana
     if mensaje in ["humano", "quiero hablar con alguien", "necesito ayuda"]:
         clientes_en_espera.add(remitente)
         return "🧑‍💼 Hace click en el enlace https://wa.me/5491153876227 y te pondremos en contacto con un asesor comercial en breve."
 
-    # Si el cliente está en espera de atención humana, no responde automáticamente
     if remitente in clientes_en_espera:
         return None
 
-    # Buscar si el mensaje coincide con alguna pregunta frecuente
     for clave, respuesta in RESPUESTAS.items():
         if clave in mensaje:
             return respuesta
 
-    # Respuesta por defecto si no coincide con ninguna pregunta
-    return "No entendí tu consulta. ¿Podrías reformularla o darme más detalles?"
+    try:
+        respuesta_gpt = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "Sos un asistente de atención al cliente de iGeneration. Respondé de forma clara y amable."},
+                {"role": "user", "content": mensaje}
+            ],
+            max_tokens=150
+        )
+        return respuesta_gpt["choices"][0]["message"]["content"]
 
-    # Temporalmente, desactivamos Tienda Nube si no está configurada
-    if "TIENDA_NUBE_ACCESS_TOKEN" not in globals() or not TIENDA_NUBE_ACCESS_TOKEN:
-        print("⚠ Tienda Nube no está configurada. Respondiendo con mensaje por defecto.")
-        return "🤖 Lo siento, la consulta sobre productos aún no está disponible."
-
-    # Temporalmente, desactivamos GPT-4 si no está configurado
-    if "OPENAI_API_KEY" not in globals() or not OPENAI_API_KEY:
-        print("⚠ GPT-4 no está configurado. Respondiendo con mensaje por defecto.")
-        return "🤖 Lo siento, aún no puedo responder preguntas generales."
-
-    # Si ya tienes Tienda Nube configurado, puedes activar esta línea más adelante:
-    # respuesta_producto = buscar_producto(mensaje)
-    # if respuesta_producto:
-    #     return respuesta_producto
-
-    # Si ya tienes GPT-4 configurado, puedes activar esta línea más adelante:
-    # return consultar_gpt(mensaje)
-
-    return "🤖 No entendí tu consulta. ¿Puedes reformularla?"
-
-# Webhook de WhatsApp
-from flask import Flask, request
-
-app = Flask(__name__)
-
-VERIFY_TOKEN = "mi-token-de-verificación"
-
-import sys
-
-import requests
+    except Exception as e:
+        print(f"❌ Error al llamar a GPT: {e}")
+        return "Disculpá, no pude entender tu consulta. ¿Podés reformularla?"
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -138,14 +107,12 @@ def webhook():
         if "messages" in json_data["entry"][0]["changes"][0]["value"]:
             mensaje = json_data["entry"][0]["changes"][0]["value"]["messages"][0]["text"]["body"]
             remitente = json_data["entry"][0]["changes"][0]["value"]["messages"][0]["from"]
-            
+
             print(f"📩 Mensaje recibido: {mensaje} de {remitente}")
             sys.stdout.flush()
 
-            # Llamar a la función correcta (antes llamaba a procesar_mensaje)
             respuesta = responder_mensaje(remitente, mensaje)
 
-            # Si la respuesta no es None, enviarla
             if respuesta:
                 enviar_respuesta(remitente, respuesta)
 
@@ -156,27 +123,12 @@ def webhook():
         sys.stdout.flush()
         return "Error", 500
 
-    except Exception as e:
-        print(f"❌ Error al procesar la solicitud: {str(e)}")
-        sys.stdout.flush()
-        return "Error", 500
-
-    except Exception as e:
-        print(f"❌ Error al procesar la solicitud: {str(e)}")
-        sys.stdout.flush()
-        return "Error", 500
-
-
-# Función para enviar mensajes de WhatsApp
-
-import time
-
 def enviar_respuesta(numero, mensaje):
-    time.sleep(2)  # Agrega una pausa de 2 segundos antes de responder
+    time.sleep(2)
 
     url = "https://graph.facebook.com/v18.0/602432446282342/messages"
     headers = {
-        "Authorization": f"Bearer EAAHz1wFDZCQABOxZCWHVRs0XdkSrCaKLbvHyS2ABw3tnnZBtgG4fLE4houMZBUiaxMiXUoLsvCOyycuXiSmAMM32Wk2auVWXJikqOAwhOSjdT4ZChdYUYabKzic9aLjk2JV12vmUfw9MEsqwwF3hYzswZCnEsKwwKZChbDxjbgmkRB1zThymTxK3WH4XcmrUZBEGgOGtzAZDZD",
+        "Authorization": f"Bearer {WHATSAPP_TOKEN}",
         "Content-Type": "application/json"
     }
     data = {
@@ -192,10 +144,8 @@ def enviar_respuesta(numero, mensaje):
     print(f"📩 Respuesta API: {response.json()}")
     sys.stdout.flush()
 
-
-import os
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))  # Usa el puerto asignado por Render
-    app.run(host="0.0.0.0", port=port)  # Escucha en todas las interfaces
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
 
