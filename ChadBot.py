@@ -1,5 +1,4 @@
 import requests
-import openai
 import os
 import time
 import sys
@@ -16,15 +15,9 @@ TIENDA_NUBE_API_URL = f"https://api.tiendanube.com/v1/{TIENDA_NUBE_STORE_ID}/pro
 WHATSAPP_TOKEN = os.environ.get("WHATSAPP_TOKEN")
 VERIFY_TOKEN = os.environ.get("mi-token-de-verificación")
 
-# Credenciales de OpenAI GPT-4
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-
-# Inicializar cliente OpenAI con nueva interfaz (openai>=1.0.0)
-from openai import OpenAI
-client = OpenAI(api_key=OPENAI_API_KEY)
-
 # Clientes en espera de atención humana
 clientes_en_espera = set()
+intentos_fallidos = {}
 
 # Función para buscar productos en Tienda Nube
 def buscar_producto(nombre_producto):
@@ -36,11 +29,11 @@ def buscar_producto(nombre_producto):
         if nombre_producto.lower() in producto["name"].lower():
             return f"📦 {producto['name']}\n💰 Precio: ${producto['price']}\n📦 Stock: {producto['stock']}\n🔗 {producto['permalink']}"
 
-    return None  # No se encontró el producto
+    return None
 
 # Función para manejar los mensajes
 def responder_mensaje(remitente, mensaje):
-    global clientes_en_espera
+    global clientes_en_espera, intentos_fallidos
 
     mensaje = mensaje.lower()
 
@@ -55,9 +48,7 @@ def responder_mensaje(remitente, mensaje):
         "ubicación": "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
         "retirar": "Sí, podes retirar tu compra por nuestro local en el Boulevard Shopping, Adrogué. Te avisaremos en cuanto esté lista.",
         "envíos": "Sí, realizamos envíos a todo el país por Correo Argentino o Andreani. Para CABA y GBA tenemos envío gratis con nuestra logística.",
-        "envios": "Sí, realizamos envíos a todo el país por Correo Argentino o Andreani. Para CABA y GBA tenemos envío gratis con nuestra logística.",
         "consola retro": "Tenemos varias en stock, se diferencian en la cantidad de juegos y consolas que emulan, te recomiendo la X2 Plus, es la más completa, pero todas estan buenisimas para recordar los juegos clasicos! Te dejo el link https://igeneration.com.ar/consolas/?mpage=2",
-        "consolas retro": "Tenemos varias en stock, se diferencian en la cantidad de juegos y consolas que emulan, te recomiendo la X2 Plus, es la más completa, pero todas estan buenisimas para recordar los juegos clasicos! Te dejo el link https://igeneration.com.ar/consolas/?mpage=2",
         "game stick": "Sí, tenemos stock. La más completa es el modelo X2 Plus, con mayor variedad de juegos de PS1, PSP y Nintendo 64. Podes ver las opciones en el siguiente enlace: https://igeneration.com.ar/consolas/?mpage=2",
         "productos": "Tenemos una gran variedad de productos de tecnología y realidad virtual. ¿Buscas algo en particular?",
         "tv box": "Tenemos varios modelos con Android oficial para usar aplicaciones como Netflix, Prime, Max con suscripción. También tenemos genéricos con acceso a series y películas. Te dejo el link para que los puedas ver: https://igeneration.com.ar/media-streaming/?mpage=2",
@@ -76,26 +67,23 @@ def responder_mensaje(remitente, mensaje):
         return "🧑‍💼 Hace click en el enlace https://wa.me/5491153876227 y te pondremos en contacto con un asesor comercial en breve."
 
     if remitente in clientes_en_espera:
+        if mensaje in ["sí", "si", "dale", "ok", "quiero", "quiero hablar"]:
+            return "🧑‍💼 Hace click en el enlace https://wa.me/5491153876227 y te pondremos en contacto con un asesor comercial en breve."
         return None
 
     for clave, respuesta in RESPUESTAS.items():
         if clave in mensaje:
+            if remitente in intentos_fallidos:
+                del intentos_fallidos[remitente]
             return respuesta
 
-    try:
-        respuesta_gpt = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "Sos un asistente de atención al cliente de iGeneration. Respondé de forma clara y amable."},
-                {"role": "user", "content": mensaje}
-            ],
-            max_tokens=150
-        )
-        return respuesta_gpt.choices[0].message.content
+    intentos_fallidos[remitente] = intentos_fallidos.get(remitente, 0) + 1
 
-    except Exception as e:
-        print(f"❌ Error al llamar a GPT: {e}")
-        return "Disculpá, no pude entender tu consulta. ¿Podés reformularla?"
+    if intentos_fallidos[remitente] >= 3:
+        intentos_fallidos[remitente] = 0
+        return "🤖 No encontré una respuesta automática. ¿Querés que te contacte un asesor humano? Responé *humano* para derivarte."
+
+    return "No entendí tu consulta. ¿Podrías reformularla o preguntarme algo distinto?"
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -152,3 +140,4 @@ def enviar_respuesta(numero, mensaje):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
