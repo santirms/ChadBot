@@ -18,7 +18,10 @@ VERIFY_TOKEN = os.environ.get("mi-token-de-verificación")
 
 # Credenciales de OpenAI GPT-4
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-openai.api_key = OPENAI_API_KEY
+
+# Inicializar cliente OpenAI con nueva interfaz (openai>=1.0.0)
+from openai import OpenAI
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Clientes en espera de atención humana
 clientes_en_espera = set()
@@ -52,7 +55,9 @@ def responder_mensaje(remitente, mensaje):
         "ubicación": "Estamos en Av. Hipolito Yrigoyen 13.298 Boulevard Shopping 1° Piso Local 252, Adrogué, Buenos Aires. ¡Te esperamos!",
         "retirar": "Sí, podes retirar tu compra por nuestro local en el Boulevard Shopping, Adrogué. Te avisaremos en cuanto esté lista.",
         "envíos": "Sí, realizamos envíos a todo el país por Correo Argentino o Andreani. Para CABA y GBA tenemos envío gratis con nuestra logística.",
+        "envios": "Sí, realizamos envíos a todo el país por Correo Argentino o Andreani. Para CABA y GBA tenemos envío gratis con nuestra logística.",
         "consola retro": "Tenemos varias en stock, se diferencian en la cantidad de juegos y consolas que emulan, te recomiendo la X2 Plus, es la más completa, pero todas estan buenisimas para recordar los juegos clasicos! Te dejo el link https://igeneration.com.ar/consolas/?mpage=2",
+        "consolas retro": "Tenemos varias en stock, se diferencian en la cantidad de juegos y consolas que emulan, te recomiendo la X2 Plus, es la más completa, pero todas estan buenisimas para recordar los juegos clasicos! Te dejo el link https://igeneration.com.ar/consolas/?mpage=2",
         "game stick": "Sí, tenemos stock. La más completa es el modelo X2 Plus, con mayor variedad de juegos de PS1, PSP y Nintendo 64. Podes ver las opciones en el siguiente enlace: https://igeneration.com.ar/consolas/?mpage=2",
         "productos": "Tenemos una gran variedad de productos de tecnología y realidad virtual. ¿Buscas algo en particular?",
         "tv box": "Tenemos varios modelos con Android oficial para usar aplicaciones como Netflix, Prime, Max con suscripción. También tenemos genéricos con acceso a series y películas. Te dejo el link para que los puedas ver: https://igeneration.com.ar/media-streaming/?mpage=2",
@@ -78,7 +83,7 @@ def responder_mensaje(remitente, mensaje):
             return respuesta
 
     try:
-        respuesta_gpt = openai.ChatCompletion.create(
+        respuesta_gpt = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "Sos un asistente de atención al cliente de iGeneration. Respondé de forma clara y amable."},
@@ -86,7 +91,7 @@ def responder_mensaje(remitente, mensaje):
             ],
             max_tokens=150
         )
-        return respuesta_gpt["choices"][0]["message"]["content"]
+        return respuesta_gpt.choices[0].message.content
 
     except Exception as e:
         print(f"❌ Error al llamar a GPT: {e}")
@@ -147,5 +152,3 @@ def enviar_respuesta(numero, mensaje):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
-
-
