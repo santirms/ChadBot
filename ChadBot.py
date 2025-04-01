@@ -124,9 +124,14 @@ def webhook():
               # 🔁 Enviar también a Chatwoot
             from chatwoot_client import obtener_o_crear_conversacion, enviar_mensaje
                
-            conversation_id = obtener_o_crear_conversacion(remitente)
-               if conversation_id:
-               enviar_mensaje(conversation_id, respuesta)
+if respuesta:
+    enviar_respuesta(remitente, respuesta)
+
+    # Mandar también a Chatwoot
+    conversation_id = obtener_o_crear_conversacion(remitente)
+    if conversation_id:
+        enviar_mensaje(conversation_id, respuesta)
+
         
         return "OK", 200
 
