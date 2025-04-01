@@ -89,6 +89,14 @@ def responder_mensaje(remitente, mensaje):
 
     return "No entendí tu consulta. ¿Podrías reformularla o preguntarme algo distinto?"
 
+from chatwoot_client import send_to_chatwoot
+
+# ya generaste la respuesta del bot con tu código:
+respuesta = generar_respuesta(mensaje_recibido)
+
+# mandamos esa respuesta a Chatwoot también:
+send_to_chatwoot(conversation_id, respuesta)
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     print("📩 Se recibió un POST en /webhook")
@@ -112,7 +120,12 @@ def webhook():
 
             if respuesta:
                 enviar_respuesta(remitente, respuesta)
-
+                
+              # 🔁 Enviar también a Chatwoot
+                conversation_id = 1  # (provisorio, podés mapearlo dinámicamente si querés)
+                from chatwoot_client import send_to_chatwoot
+                send_to_chatwoot(conversation_id, f"🟢 Bot respondió a {remitente}: {respuesta}")
+        
         return "OK", 200
 
     except Exception as e:
