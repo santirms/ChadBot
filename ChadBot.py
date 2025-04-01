@@ -122,9 +122,11 @@ def webhook():
                 enviar_respuesta(remitente, respuesta)
                 
               # 🔁 Enviar también a Chatwoot
-                conversation_id = 1  # (provisorio, podés mapearlo dinámicamente si querés)
-                from chatwoot_client import send_to_chatwoot
-                send_to_chatwoot(conversation_id, f"🟢 Bot respondió a {remitente}: {respuesta}")
+            from chatwoot_client import obtener_o_crear_conversacion, enviar_mensaje
+               
+            conversation_id = obtener_o_crear_conversacion(remitente)
+               if conversation_id:
+               enviar_mensaje(conversation_id, respuesta)
         
         return "OK", 200
 
