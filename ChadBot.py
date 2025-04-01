@@ -89,14 +89,6 @@ def responder_mensaje(remitente, mensaje):
 
     return "No entendí tu consulta. ¿Podrías reformularla o preguntarme algo distinto?"
 
-from chatwoot_client import send_to_chatwoot
-
-# ya generaste la respuesta del bot con tu código:
-respuesta = generar_respuesta(mensaje_recibido)
-
-# mandamos esa respuesta a Chatwoot también:
-send_to_chatwoot(conversation_id, respuesta)
-
 @app.route("/webhook", methods=["POST"])
 def webhook():
     print("📩 Se recibió un POST en /webhook")
@@ -120,25 +112,20 @@ def webhook():
 
             if respuesta:
                 enviar_respuesta(remitente, respuesta)
-                
-              # 🔁 Enviar también a Chatwoot
-            from chatwoot_client import obtener_o_crear_conversacion, enviar_mensaje
-               
-if respuesta:
-    enviar_respuesta(remitente, respuesta)
 
-    # Mandar también a Chatwoot
-    conversation_id = obtener_o_crear_conversacion(remitente)
-    if conversation_id:
-        enviar_mensaje(conversation_id, respuesta)
+                # 🔁 Enviar también a Chatwoot
+                from chatwoot_client import obtener_o_crear_conversacion, enviar_mensaje
+                conversation_id = obtener_o_crear_conversacion(remitente)
+                if conversation_id:
+                    enviar_mensaje(conversation_id, respuesta)
 
-        
         return "OK", 200
 
     except Exception as e:
         print(f"❌ Error al procesar la solicitud: {str(e)}")
         sys.stdout.flush()
         return "Error", 500
+
 
 def enviar_respuesta(numero, mensaje):
     time.sleep(2)
