@@ -4,6 +4,21 @@ import time
 import sys
 from flask import Flask, request
 
+# TEST conexión Chatwoot
+print("📡 Verificando conexión con Chatwoot API...")
+
+try:
+    url = f"{os.environ.get('CHATWOOT_URL')}/api/v1/profile"
+    headers = {
+        "Content-Type": "application/json",
+        "api_access_token": os.environ.get("CHATWOOT_API_KEY")
+    }
+    r = requests.get(url, headers=headers)
+    print(f"🌐 Status: {r.status_code}")
+    print(f"🔁 Respuesta: {r.text}")
+except Exception as e:
+    print(f"❌ Error al conectar con Chatwoot: {e}")
+
 app = Flask(__name__)
 
 # Credenciales de Tienda Nube
