@@ -38,14 +38,13 @@ def enviar_mensaje(conversation_id, mensaje):
     payload = {
         "content": mensaje,
         "message_type": "outgoing"
-        
+    }
+    
 print(f"📡 Enviando mensaje a Chatwoot:")
 print(f"URL: {url}")
 print(f"Headers: {HEADERS}")
 print(f"Payload: {payload}")
-        
-    }
-
+      
     response = requests.post(url, json=payload, headers=HEADERS)
 
     if response.ok:
