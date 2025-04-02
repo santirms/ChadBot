@@ -14,7 +14,7 @@ print(f"🌍 URL USADA: {CHATWOOT_URL}")
 url = f"{CHATWOOT_URL}/api/v1/profile"
 headers = {
     "Content-Type": "application/json",
-    "Authorization": f"Bearer {API_KEY}"
+    "api_access_token": API_KEY
 }
 
 try:
