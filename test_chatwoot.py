@@ -4,6 +4,8 @@ import requests
 CHATWOOT_URL = os.environ.get("CHATWOOT_URL")  # Ej: https://chat.igeneration.com.ar
 API_KEY = os.environ.get("CHATWOOT_API_KEY")
 
+print(f"🔐 TOKEN RAW: {repr(API_KEY)}")
+
 if not CHATWOOT_URL or not API_KEY:
     print("❌ Faltan variables de entorno: CHATWOOT_URL o CHATWOOT_API_KEY")
     exit(1)
