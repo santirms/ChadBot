@@ -9,7 +9,7 @@ ACCOUNT_ID = 2  # Normalmente 1 si no cambiaste la cuenta principal
 
 HEADERS = {
     "Content-Type": "application/json",
-    "api_access_token": API_KEY
+    "Authorization": f"Bearer {API_KEY}"
 }
 
 def obtener_o_crear_conversacion(phone_number):
