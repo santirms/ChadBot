@@ -162,6 +162,29 @@ def enviar_respuesta(numero, mensaje):
     print(f"✅ Respuesta enviada a {numero}: {mensaje}")
     print(f"📩 Respuesta API: {response.json()}")
     sys.stdout.flush()
+    
+@app.route("/test_chatwoot", methods=["GET"])
+def test_chatwoot():
+    CHATWOOT_URL = os.environ.get("CHATWOOT_URL")
+    API_KEY = os.environ.get("CHATWOOT_API_KEY")
+
+    if not CHATWOOT_URL or not API_KEY:
+        return "❌ Faltan variables de entorno", 500
+
+    url = f"{CHATWOOT_URL}/api/v1/profile"
+    headers = {
+        "Content-Type": "application/json",
+        "api_access_token": API_KEY
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        if response.ok:
+            return f"✅ ¡Conexión exitosa! Perfil: {response.json()}"
+        else:
+            return f"❌ Error {response.status_code}: {response.text}", response.status_code
+    except Exception as e:
+        return f"❌ Excepción: {str(e)}", 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
