@@ -5,7 +5,7 @@ import os
 CHATWOOT_URL = os.environ.get("CHATWOOT_URL")  # Ej: https://chat.igeneration.com.ar
 API_KEY = os.environ.get("CHATWOOT_API_KEY")
 INBOX_ID = os.environ.get("CHATWOOT_INBOX_ID")  # ID del inbox (WhatsApp)
-ACCOUNT_ID = 1  # Normalmente 1 si no cambiaste la cuenta principal
+ACCOUNT_ID = 2  # Normalmente 1 si no cambiaste la cuenta principal
 
 HEADERS = {
     "Content-Type": "application/json",
