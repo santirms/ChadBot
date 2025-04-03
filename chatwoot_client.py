@@ -1,7 +1,7 @@
-import requests
-import os
 from dotenv import load_dotenv
 load_dotenv()
+import requests
+import os
 
 # Config desde variables de entorno
 CHATWOOT_URL = os.environ.get("CHATWOOT_URL")  # Ej: https://chat.igeneration.com.ar
