@@ -6,6 +6,11 @@ import time
 import sys
 from flask import Flask, request
 
+print("🔎 Variables de entorno disponibles:")
+for key, value in os.environ.items():
+    if "CHATWOOT" in key:
+        print(f"{key} = {value}")
+
 # TEST conexión Chatwoot
 print("📡 Verificando conexión con Chatwoot API...")
 
