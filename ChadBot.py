@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 import requests
 import os
 import time
@@ -16,6 +18,7 @@ try:
     r = requests.get(url, headers=headers)
     print(f"🌐 Status: {r.status_code}")
     print(f"🔁 Respuesta: {r.text}")
+    
 except Exception as e:
     print(f"❌ Error al conectar con Chatwoot: {e}")
 
