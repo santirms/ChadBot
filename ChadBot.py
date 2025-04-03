@@ -7,6 +7,10 @@ import sys
 from flask import Flask, request
 
 print("🔎 Variables de entorno disponibles:")
+print("CHATWOOT_API_KEY =", repr(os.environ.get("CHATWOOT_API_KEY")))
+print("CHATWOOT_URL =", repr(os.environ.get("CHATWOOT_URL")))
+
+print("🔎 Variables de entorno disponibles:")
 for key, value in os.environ.items():
     if "CHATWOOT" in key:
         print(f"{key} = {value}")
