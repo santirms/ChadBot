@@ -1,5 +1,7 @@
 import os
 import requests
+from dotenv import load_dotenv
+load_dotenv()
 
 CHATWOOT_URL = os.environ.get("CHATWOOT_URL")  # Ej: https://chat.igeneration.com.ar
 API_KEY = os.environ.get("CHATWOOT_API_KEY")
