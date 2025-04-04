@@ -13,19 +13,22 @@ for key, value in os.environ.items():
     if "CHATWOOT" in key:
         print(f"{key} = {value}")
 
+# 💡 Asignar variables antes del try
+CHATWOOT_URL = os.environ.get("CHATWOOT_URL")
+API_KEY = os.environ.get("CHATWOOT_API_KEY")
+
 # TEST conexión Chatwoot
 print("📡 Verificando conexión con Chatwoot API...")
 
 try:
-    url = f"{os.environ.get('CHATWOOT_URL')}/api/v1/profile"
+    url = f"{CHATWOOT_URL}/api/v1/profile"
     HEADERS = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {API_KEY}"
-}
-    r = requests.get(url, headers=headers)
+    }
+    r = requests.get(url, headers=HEADERS)
     print(f"🌐 Status: {r.status_code}")
     print(f"🔁 Respuesta: {r.text}")
-    
 except Exception as e:
     print(f"❌ Error al conectar con Chatwoot: {e}")
 
