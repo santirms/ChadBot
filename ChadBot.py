@@ -18,10 +18,10 @@ print("📡 Verificando conexión con Chatwoot API...")
 
 try:
     url = f"{os.environ.get('CHATWOOT_URL')}/api/v1/profile"
-    headers = {
+    HEADERS = {
         "Content-Type": "application/json",
-        "api_access_token": os.environ.get("CHATWOOT_API_KEY")
-    }
+        "Authorization": f"Bearer {API_KEY}"
+}
     r = requests.get(url, headers=headers)
     print(f"🌐 Status: {r.status_code}")
     print(f"🔁 Respuesta: {r.text}")
