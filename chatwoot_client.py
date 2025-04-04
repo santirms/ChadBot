@@ -9,7 +9,7 @@ ACCOUNT_ID = int(os.environ.get("CHATWOOT_ACCOUNT_ID", 2))
 
 HEADERS = {
     "Content-Type": "application/json",
-    "api_access_token": API_KEY  # ¡no Authorization: Bearer!
+    "Authorization": f"Bearer {API_KEY}"
 }
 
 def obtener_o_crear_conversacion(phone_number):
