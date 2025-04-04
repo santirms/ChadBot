@@ -5,7 +5,7 @@ import os
 
 # Config desde variables de entorno
 CHATWOOT_URL = os.environ.get("CHATWOOT_URL")  # Ej: https://chat.igeneration.com.ar
-API_KEY = "1ed657413b087e79a557c0114ad1378b2b4889d19485598d3aa725c0f1851650a3f946b3c144b526"
+API_KEY = os.environ.get("CHATWOOT_API_KEY")
 INBOX_ID = os.environ.get("CHATWOOT_INBOX_ID")  # ID del inbox (WhatsApp)
 ACCOUNT_ID = int(os.environ.get("CHATWOOT_ACCOUNT_ID", 2))
 
