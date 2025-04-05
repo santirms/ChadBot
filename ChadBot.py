@@ -17,19 +17,40 @@ for key, value in os.environ.items():
 print("📡 Verificando conexión con Chatwoot API...")
 
 try:
+    # --- Inicio del bloque try ---
     CHATWOOT_URL = os.environ.get("CHATWOOT_URL")
     API_KEY = os.environ.get("CHATWOOT_API_KEY")
-    url = f"{CHATWOOT_URL}/api/v1/profile"
-    
-HEADERS = {
-     "Content-Type": "application/json",
-     "api_access_token": API_KEY # <--- Corregir aquí también
- }
-    r = requests.get(url, headers=HEADERS)
-    print(f"🌐 Status: {r.status_code}")
-    print(f"🔁 Respuesta: {r.text}")
+
+    # Verificar si las variables existen antes de usarlas
+    if not CHATWOOT_URL or not API_KEY:
+        print("❌ Error: Faltan las variables de entorno CHATWOOT_URL o CHATWOOT_API_KEY.")
+    else:
+        url = f"{CHATWOOT_URL}/api/v1/profile"
+
+        # Define HEADERS *dentro* del try, antes de usarlos
+        HEADERS = {
+            "Content-Type": "application/json",
+            "api_access_token": API_KEY  # Cabecera CORREGIDA
+        }
+
+        # Realiza la llamada a la API *dentro* del try
+        print(f"📞 Intentando GET a {url} con cabecera api_access_token...")
+        r = requests.get(url, headers=HEADERS, timeout=10) # Añadido timeout
+
+        # Imprime el resultado *dentro* del try
+        print(f"🌐 Status: {r.status_code}")
+        print(f"🔁 Respuesta: {r.text}")
+        r.raise_for_status() # Opcional: Lanza un error si el código no es 2xx
+
+    # --- Fin de la parte principal del try ---
+
+# --- Bloque except OBLIGATORIO ---
+except requests.exceptions.RequestException as e:
+    # Captura errores específicos de red/http si usas raise_for_status o hay problemas de conexión
+    print(f"❌ Error de Red/HTTP al conectar con Chatwoot: {e}")
 except Exception as e:
-    print(f"❌ Error al conectar con Chatwoot: {e}")
+    # Captura cualquier otro error inesperado durante el bloque try
+    print(f"❌ Error inesperado durante la verificación de Chatwoot: {e}")
 
 app = Flask(__name__)
 
