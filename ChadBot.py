@@ -20,7 +20,7 @@ try:
     CHATWOOT_URL = os.environ.get("CHATWOOT_URL")
     API_KEY = os.environ.get("CHATWOOT_API_KEY")
     url = f"{CHATWOOT_URL}/api/v1/profile"
-     HEADERS = {
+HEADERS = {
      "Content-Type": "application/json",
      "api_access_token": API_KEY # <--- Corregir aquí también
  }
