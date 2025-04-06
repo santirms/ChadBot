@@ -30,15 +30,18 @@ try:
     else:
         url = f"{CHATWOOT_URL}/api/v1/profile"
 
-        # Define HEADERS *dentro* del try, antes de usarlos
-    HEADERS = {
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {API_KEY}"
-}
+        # Define HEADERS *dentro* del else
+        HEADERS = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {API_KEY}"
+        }
 
-# Realiza la llamada a la API *dentro* del try
-print(f"📞 Intentando GET a {url} con cabecera Authorization...")
-r = requests.get(url, headers=HEADERS, timeout=10)  # Añadido timeout
+        # Realiza la llamada a la API
+        print(f"📞 Intentando GET a {url} con cabecera Authorization...")
+        r = requests.get(url, headers=HEADERS, timeout=10)
+        print(f"🌐 Status: {r.status_code}")
+        print(f"🔁 Respuesta: {r.text}")
+        r.raise_for_status()
 
 
         # Imprime el resultado *dentro* del try
