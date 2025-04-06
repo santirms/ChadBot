@@ -16,22 +16,13 @@ def obtener_token_temporal():
     payload = {
         "email": CHATWOOT_EMAIL,
         "password": CHATWOOT_PASSWORD
-    try:
-        response = requests.post(login_url, json=payload)
-        print(f"🔁 Respuesta completa del login: {response.status_code} {response.text}")  # NUEVA LÍNEA 👈
-
-        if response.status_code == 200:
-            print("🔑 Login exitoso en Chatwoot")
-            return response.json().get("data", {}).get("access_token")
-        else:
-            print(f"❌ Error al iniciar sesión: {response.status_code} {response.text}")
-            return None
     }
 
     try:
         response = requests.post(login_url, json=payload)
         if response.status_code == 200:
             token = response.headers.get("api-access-token")
+            print(f"🔁 Respuesta completa del login: {response.status_code} {response.text}")  # NUEVA LÍNEA 👈
             print(f"🔑 Login exitoso en Chatwoot. Token: {token}")
             return token
 
