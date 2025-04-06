@@ -33,7 +33,7 @@ try:
         # Define HEADERS *dentro* del else
         HEADERS = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {API_KEY}"
+            "api_access_token": os.environ.get("CHATWOOT_API_KEY")
         }
 
         # Realiza la llamada a la API
