@@ -5,40 +5,42 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Variables de entorno
-CHATWOOT_URL = os.environ.get("CHATWOOT_URL")  # Ej: https://chat.igeneration.com.ar
-EMAIL = os.environ.get("CHATWOOT_EMAIL")
-PASSWORD = os.environ.get("CHATWOOT_PASSWORD")
+CHATWOOT_URL = os.environ.get("CHATWOOT_URL")
+CHATWOOT_EMAIL = os.environ.get("CHATWOOT_EMAIL")
+CHATWOOT_PASSWORD = os.environ.get("CHATWOOT_PASSWORD")
 INBOX_ID = os.environ.get("CHATWOOT_INBOX_ID")
 ACCOUNT_ID = os.environ.get("CHATWOOT_ACCOUNT_ID")
 
-# 🔐 Autenticación con email/contraseña
-def obtener_headers_autenticacion():
+def obtener_token_temporal():
     login_url = f"{CHATWOOT_URL}/auth/sign_in"
-    login_data = {
-        "email": EMAIL,
-        "password": PASSWORD
+    payload = {
+        "email": CHATWOOT_EMAIL,
+        "password": CHATWOOT_PASSWORD
     }
 
-    response = requests.post(login_url, json=login_data)
-    if response.status_code == 200:
-        print("✅ Login exitoso en Chatwoot")
-        return {
-            "Content-Type": "application/json",
-            "access-token": response.headers["access-token"],
-            "client": response.headers["client"],
-            "uid": response.headers["uid"]
-        }
-    else:
-        print(f"❌ Error al loguearse en Chatwoot: {response.status_code} {response.text}")
+    try:
+        response = requests.post(login_url, json=payload)
+        if response.status_code == 200:
+            print("🔑 Login exitoso en Chatwoot")
+            return response.json().get("data", {}).get("access_token")
+        else:
+            print(f"❌ Error al iniciar sesión: {response.status_code} {response.text}")
+            return None
+    except Exception as e:
+        print(f"❌ Error de red al intentar login: {str(e)}")
         return None
 
-# Crear u obtener conversación
 def obtener_o_crear_conversacion(phone_number):
-    headers = obtener_headers_autenticacion()
-    if not headers:
+    token = obtener_token_temporal()
+    if not token:
         return None
 
     url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations"
+    headers = {
+        "Content-Type": "application/json",
+        "api_access_token": token
+    }
+
     payload = {
         "source_id": phone_number,
         "inbox_id": int(INBOX_ID),
@@ -58,13 +60,17 @@ def obtener_o_crear_conversacion(phone_number):
         print(f"❌ Error al obtener/crear conversación: {response.status_code} {response.text}")
         return None
 
-# Enviar mensaje a conversación
 def enviar_mensaje(conversation_id, mensaje):
-    headers = obtener_headers_autenticacion()
-    if not headers:
+    token = obtener_token_temporal()
+    if not token:
         return
 
     url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations/{conversation_id}/messages"
+    headers = {
+        "Content-Type": "application/json",
+        "api_access_token": token
+    }
+
     payload = {
         "content": mensaje,
         "message_type": "outgoing"
@@ -81,3 +87,4 @@ def enviar_mensaje(conversation_id, mensaje):
         print("✅ Mensaje enviado a Chatwoot")
     else:
         print(f"❌ Error enviando mensaje: {response.status_code} {response.text}")
+
