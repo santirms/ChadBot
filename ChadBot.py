@@ -1,8 +1,11 @@
-import requests
 import os
+from dotenv import load_dotenv
+import requests
 import time
 import sys
 from flask import Flask, request
+
+load_dotenv()
 
 print("🔎 Variables de entorno disponibles:")
 print("CHATWOOT_API_KEY =", repr(os.environ.get("CHATWOOT_API_KEY")))
