@@ -31,7 +31,7 @@ try:
         url = f"{CHATWOOT_URL}/api/v1/profile"
 
         # Define HEADERS *dentro* del try, antes de usarlos
-HEADERS = {
+    HEADERS = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {API_KEY}"
 }
