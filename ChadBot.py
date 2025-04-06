@@ -193,6 +193,21 @@ def test_chatwoot():
             return f"❌ Error {response.status_code}: {response.text}", response.status_code
     except Exception as e:
         return f"❌ Excepción: {str(e)}", 500
+        
+@app.route("/webhook", methods=["GET"])
+def verificar_webhook():
+    mode = request.args.get("hub.mode")
+    token = request.args.get("hub.verify_token")
+    challenge = request.args.get("hub.challenge")
+
+    print("📩 GET recibido para verificación")
+    print(f"Modo: {mode}, Token: {token}, Challenge: {challenge}")
+    sys.stdout.flush()
+
+    if mode == "subscribe" and token == VERIFY_TOKEN:
+        return challenge, 200
+    else:
+        return "❌ Verificación fallida", 403
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
