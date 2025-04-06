@@ -31,12 +31,12 @@ try:
         url = f"{CHATWOOT_URL}/api/v1/profile"
 
         # Define HEADERS *dentro* del try, antes de usarlos
-    HEADERS = {
-      "Content-Type": "application/json",
-      "Authorization": f"Bearer {API_KEY}"
+HEADERS = {
+"Content-Type": "application/json",
+"Authorization": f"Bearer {API_KEY}"
 }
 
-        # Realiza la llamada a la API *dentro* del try
+    # Realiza la llamada a la API *dentro* del try
         print(f"📞 Intentando GET a {url} con cabecera api_access_token...")
         r = requests.get(url, headers=HEADERS, timeout=10) # Añadido timeout
 
