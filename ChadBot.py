@@ -8,56 +8,9 @@ from flask import Flask, request
 load_dotenv()
 
 print("🔎 Variables de entorno disponibles:")
-print("CHATWOOT_API_KEY =", repr(os.environ.get("CHATWOOT_API_KEY")))
-print("CHATWOOT_URL =", repr(os.environ.get("CHATWOOT_URL")))
-
-print("🔎 Variables de entorno disponibles:")
 for key, value in os.environ.items():
     if "CHATWOOT" in key:
         print(f"{key} = {value}")
-
-# TEST conexión Chatwoot
-print("📡 Verificando conexión con Chatwoot API...")
-
-try:
-    # --- Inicio del bloque try ---
-    CHATWOOT_URL = os.environ.get("CHATWOOT_URL")
-    API_KEY = os.environ.get("CHATWOOT_API_KEY")
-
-    # Verificar si las variables existen antes de usarlas
-    if not CHATWOOT_URL or not API_KEY:
-        print("❌ Error: Faltan las variables de entorno CHATWOOT_URL o CHATWOOT_API_KEY.")
-    else:
-        url = f"{CHATWOOT_URL}/api/v1/profile"
-
-        # Define HEADERS *dentro* del else
-        HEADERS = {
-            "Content-Type": "application/json",
-            "api_access_token": os.environ.get("CHATWOOT_API_KEY")
-        }
-
-        # Realiza la llamada a la API
-        print(f"📞 Intentando GET a {url} con cabecera Authorization...")
-        r = requests.get(url, headers=HEADERS, timeout=10)
-        print(f"🌐 Status: {r.status_code}")
-        print(f"🔁 Respuesta: {r.text}")
-        r.raise_for_status()
-
-
-        # Imprime el resultado *dentro* del try
-        print(f"🌐 Status: {r.status_code}")
-        print(f"🔁 Respuesta: {r.text}")
-        r.raise_for_status() # Opcional: Lanza un error si el código no es 2xx
-
-    # --- Fin de la parte principal del try ---
-
-# --- Bloque except OBLIGATORIO ---
-except requests.exceptions.RequestException as e:
-    # Captura errores específicos de red/http si usas raise_for_status o hay problemas de conexión
-    print(f"❌ Error de Red/HTTP al conectar con Chatwoot: {e}")
-except Exception as e:
-    # Captura cualquier otro error inesperado durante el bloque try
-    print(f"❌ Error inesperado durante la verificación de Chatwoot: {e}")
 
 app = Flask(__name__)
 
