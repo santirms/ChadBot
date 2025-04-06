@@ -99,8 +99,21 @@ def responder_mensaje(remitente, mensaje):
 
     return "No entendí tu consulta. ¿Podrías reformularla o preguntarme algo distinto?"
 
-@app.route("/webhook", methods=["POST"])
+@app.route("/webhook", methods=["GET", "POST"])
 def webhook():
+    if request.method == "GET":
+        # Verificación de webhook desde Meta
+        mode = request.args.get("hub.mode")
+        token = request.args.get("hub.verify_token")
+        challenge = request.args.get("hub.challenge")
+
+        if mode == "subscribe" and token == VERIFY_TOKEN:
+            print("✅ Webhook verificado correctamente con Meta.")
+            return challenge, 200
+        else:
+            print("❌ Falló la verificación del webhook con Meta.")
+            return "Error de verificación", 403
+
     print("📩 Se recibió un POST en /webhook")
     sys.stdout.flush()
 
