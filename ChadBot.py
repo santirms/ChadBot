@@ -11,6 +11,8 @@ print("🔎 Variables de entorno disponibles:")
 for key, value in os.environ.items():
     if "CHATWOOT" in key:
         print(f"{key} = {value}")
+        
+print("🔒 VERIFY_TOKEN =", repr(os.environ.get("VERIFY_TOKEN")))
 
 app = Flask(__name__)
 
