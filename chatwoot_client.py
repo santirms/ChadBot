@@ -60,8 +60,7 @@ def obtener_o_crear_conversacion(phone_number):
 
     try:
        response = requests.post(url, json=payload, headers=headers)
-    try:
-        data = response.json()
+       data = response.json()
     except Exception as e:
         print(f"❌ Error al parsear respuesta JSON: {e}")
         print(f"🔁 Respuesta cruda: {response.text}")
