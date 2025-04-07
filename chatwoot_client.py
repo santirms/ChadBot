@@ -21,7 +21,7 @@ def obtener_token_temporal():
     try:
         response = requests.post(login_url, json=payload)
         if response.status_code == 200:
-            token = response.headers.get("api-access-token")
+            token = response.json().get("data", {}).get("access_token")
             print(f"🔁 Respuesta completa del login: {response.status_code} {response.text}")  # NUEVA LÍNEA 👈
             print(f"🔑 Login exitoso en Chatwoot. Token: {token}")
             return token
