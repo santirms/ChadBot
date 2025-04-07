@@ -41,8 +41,10 @@ def obtener_o_crear_conversacion(phone_number):
     url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations"
     headers = {
         "Content-Type": "application/json",
-        "api_access_token": token
-    }
+        "api-access-token": token,
+        "uid": CHATWOOT_EMAIL
+}
+
 
     payload = {
         "source_id": phone_number,
@@ -71,8 +73,10 @@ def enviar_mensaje(conversation_id, mensaje):
     url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations/{conversation_id}/messages"
     headers = {
         "Content-Type": "application/json",
-        "api_access_token": token
-    }
+        "api-access-token": token,
+        "uid": CHATWOOT_EMAIL
+}
+
 
     payload = {
         "content": mensaje,
