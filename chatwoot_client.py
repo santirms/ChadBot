@@ -54,8 +54,8 @@ def obtener_o_crear_conversacion(phone_number):
     contact_url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/contacts"
     contact_payload = {
         "name": f"Cliente {phone_number}",
-        "phone_number": phone_number,
-        "identifier": phone_number
+        "phone_number": f"+{phone_number}",
+        "identifier": f"+{phone_number}"
     }
 
     try:
