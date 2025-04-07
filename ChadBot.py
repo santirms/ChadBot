@@ -114,13 +114,16 @@ def webhook():
             print("❌ Falló la verificación del webhook con Meta.")
             return "Error de verificación", 403
 
+    # ✅ Nueva validación
+    json_data = request.get_json(silent=True)
+    if not json_data or "entry" not in json_data:
+        print("🔁 Webhook no es de WhatsApp. Ignorado.")
+        return "Ignored", 200
+
     print("📩 Se recibió un POST en /webhook")
     sys.stdout.flush()
 
     try:
-        raw_data = request.data
-        json_data = request.get_json(silent=True)
-
         print(f"📩 JSON recibido: {json_data}")
         sys.stdout.flush()
 
@@ -133,7 +136,7 @@ def webhook():
 
             respuesta = responder_mensaje(remitente, mensaje)
 
-            if respuesta:
+            if respuesta and remitente.startswith("549"):
                 enviar_respuesta(remitente, respuesta)
 
                 # 🔁 Enviar también a Chatwoot
@@ -148,7 +151,6 @@ def webhook():
         print(f"❌ Error al procesar la solicitud: {str(e)}")
         sys.stdout.flush()
         return "Error", 500
-
 
 def enviar_respuesta(numero, mensaje):
     time.sleep(2)
