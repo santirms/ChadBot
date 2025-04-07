@@ -54,9 +54,6 @@ def obtener_o_crear_conversacion(phone_number):
         "Content-Type": "application/json",
         **token
 }
-
-}
-
     payload = {
         "source_id": phone_number,
         "inbox_id": int(INBOX_ID),
