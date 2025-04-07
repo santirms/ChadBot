@@ -60,8 +60,7 @@ def obtener_o_crear_conversacion(phone_number):
             "name": f"Cliente {phone_number}",
             "phone_number": phone_number,
             "identifier": phone_number  # ✅ OBLIGATORIO
-        },
-        "contact_id": None
+        }
     }
 
     response = requests.post(url, json=payload, headers=headers)
