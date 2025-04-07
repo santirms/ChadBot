@@ -20,11 +20,13 @@ def obtener_token_temporal():
 
     try:
         response = requests.post(login_url, json=payload)
+        print(f"🔁 Respuesta completa del login: {response.status_code} {response.text}")
+
         if response.status_code == 200:
-            print(f"🔁 Respuesta completa del login: {response.status_code} {response.text}")
             token = response.headers.get("api-access-token")
             uid = response.headers.get("uid")
             client = response.headers.get("client")
+
             print(f"🔑 Login exitoso en Chatwoot. Token: {token}")
             return {
                 "api-access-token": token,
@@ -44,13 +46,15 @@ def obtener_o_crear_conversacion(phone_number):
         return None
 
     url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations"
-    token_headers = obtener_token_temporal()
-    if not token_headers:
-        return None
+    token = obtener_token_temporal()
+    if not token:
+        return
 
     headers = {
         "Content-Type": "application/json",
-        **token_headers
+        **token
+}
+
 }
 
     payload = {
@@ -81,13 +85,15 @@ def enviar_mensaje(conversation_id, mensaje):
         return
 
     url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations/{conversation_id}/messages"
-    token_headers = obtener_token_temporal()
-    if not token_headers:
-        return None
+    token = obtener_token_temporal()
+    if not token:
+        return
 
     headers = {
         "Content-Type": "application/json",
-        **token_headers
+        **token
+}
+
 }
 
 
