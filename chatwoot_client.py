@@ -45,15 +45,17 @@ def obtener_o_crear_conversacion(phone_number):
         "uid": CHATWOOT_EMAIL
 }
 
-
     payload = {
         "source_id": phone_number,
         "inbox_id": int(INBOX_ID),
         "contact": {
             "name": f"Cliente {phone_number}",
-            "phone_number": phone_number
-        }
-    }
+            "phone_number": phone_number,
+            "identifier": phone_number  # ⚠️ Esto es importante para evitar el 404
+        },
+        "contact_id": None  # ⚠️ Obligamos a crear uno nuevo si no existe
+}
+
 
     response = requests.post(url, json=payload, headers=headers)
 
