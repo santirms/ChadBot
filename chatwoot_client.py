@@ -54,7 +54,6 @@ def obtener_o_crear_conversacion(phone_number):
     }
 
     payload = {
-        "source_id": phone_number,
         "inbox_id": int(INBOX_ID),
         "contact": {
             "name": f"Cliente {phone_number}",
