@@ -23,13 +23,13 @@ def obtener_token_temporal():
         print(f"🔁 Respuesta completa del login: {response.status_code} {response.text}")
 
         if response.status_code == 200:
-            token = response.headers.get("api-access-token")
+            token = response.headers.get("access-token")  # ✅ CORREGIDO
             uid = response.headers.get("uid")
             client = response.headers.get("client")
 
             print(f"🔑 Login exitoso en Chatwoot. Token: {token}")
             return {
-                "api-access-token": token,
+                "access-token": token,
                 "uid": uid,
                 "client": client
             }
@@ -46,25 +46,23 @@ def obtener_o_crear_conversacion(phone_number):
         return None
 
     url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations"
-    token = obtener_token_temporal()
-    if not token:
-        return
-
     headers = {
         "Content-Type": "application/json",
-        **token
-}
+        "access-token": token["access-token"],
+        "uid": token["uid"],
+        "client": token["client"]
+    }
+
     payload = {
         "source_id": phone_number,
         "inbox_id": int(INBOX_ID),
         "contact": {
             "name": f"Cliente {phone_number}",
             "phone_number": phone_number,
-            "identifier": phone_number  # ⚠️ Esto es importante para evitar el 404
+            "identifier": phone_number  # ✅ OBLIGATORIO
         },
-        "contact_id": None  # ⚠️ Obligamos a crear uno nuevo si no existe
-}
-
+        "contact_id": None
+    }
 
     response = requests.post(url, json=payload, headers=headers)
 
@@ -82,14 +80,13 @@ def enviar_mensaje(conversation_id, mensaje):
         return
 
     url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations/{conversation_id}/messages"
-    token = obtener_token_temporal()
-    if not token:
-        return
-
     headers = {
         "Content-Type": "application/json",
-        **token
-}
+        "access-token": token["access-token"],
+        "uid": token["uid"],
+        "client": token["client"]
+    }
+
     payload = {
         "content": mensaje,
         "message_type": "outgoing"
@@ -106,4 +103,5 @@ def enviar_mensaje(conversation_id, mensaje):
         print("✅ Mensaje enviado a Chatwoot")
     else:
         print(f"❌ Error enviando mensaje: {response.status_code} {response.text}")
+
 
