@@ -90,10 +90,6 @@ def enviar_mensaje(conversation_id, mensaje):
         "Content-Type": "application/json",
         **token
 }
-
-}
-
-
     payload = {
         "content": mensaje,
         "message_type": "outgoing"
