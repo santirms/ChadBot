@@ -47,10 +47,12 @@ def obtener_o_crear_conversacion(phone_number):
 
     headers = {
         "Content-Type": "application/json",
-        **token
+        "access-token": token["access-token"],
+        "uid": token["uid"],
+        "client": token["client"]
     }
 
-    # 1. Buscar o crear el contacto
+    # 1. Crear el contacto
     contact_url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/contacts"
     contact_payload = {
         "name": f"Cliente {phone_number}",
@@ -59,22 +61,21 @@ def obtener_o_crear_conversacion(phone_number):
     }
 
     try:
-       response = requests.post(url, json=payload, headers=headers)
-       data = response.json()
+        response = requests.post(contact_url, json=contact_payload, headers=headers)
+        data = response.json()
+        contact_id = data.get("id")
+
+        if not contact_id:
+            print(f"❌ Error creando contacto: {response.status_code} {response.text}")
+            return None
+
+        print(f"✅ Contacto creado con ID: {contact_id}")
+
     except Exception as e:
-        print(f"❌ Error al parsear respuesta JSON: {e}")
-        print(f"🔁 Respuesta cruda: {response.text}")
+        print(f"❌ Excepción al crear contacto: {e}")
         return None
 
-    if response.status_code in [200, 201] and "id" in data:
-        conversation_id = data["id"]
-        print(f"✅ Conversación Chatwoot ID {conversation_id} obtenida/creada para {phone_number}")
-        return conversation_id
-    else:
-        print(f"❌ Error al obtener/crear conversación: {response.status_code} {response.text}")
-        return None
-
-    # 2. Crear conversación con el contact_id
+    # 2. Crear la conversación
     conv_url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations"
     conv_payload = {
         "inbox_id": int(INBOX_ID),
@@ -83,8 +84,10 @@ def obtener_o_crear_conversacion(phone_number):
 
     try:
         response = requests.post(conv_url, json=conv_payload, headers=headers)
-        if response.status_code in [200, 201]:
-            conversation_id = response.json()["id"]
+        data = response.json()
+
+        if response.status_code in [200, 201] and "id" in data:
+            conversation_id = data["id"]
             print(f"✅ Conversación creada: {conversation_id}")
             return conversation_id
         else:
