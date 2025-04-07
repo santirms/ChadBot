@@ -45,31 +45,49 @@ def obtener_o_crear_conversacion(phone_number):
     if not token:
         return None
 
-    url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations"
     headers = {
         "Content-Type": "application/json",
-        "access-token": token["access-token"],
-        "uid": token["uid"],
-        "client": token["client"]
+        **token
     }
 
-    payload = {
+    # 1. Buscar o crear el contacto
+    contact_url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/contacts"
+    contact_payload = {
+        "name": f"Cliente {phone_number}",
+        "phone_number": phone_number,
+        "identifier": phone_number
+    }
+
+    try:
+        response = requests.post(contact_url, json=contact_payload, headers=headers)
+        if response.status_code in [200, 201]:
+            contact_id = response.json()["id"]
+            print(f"✅ Contacto creado/encontrado: {contact_id}")
+        else:
+            print(f"❌ Error creando contacto: {response.status_code} {response.text}")
+            return None
+    except Exception as e:
+        print(f"❌ Excepción al crear contacto: {e}")
+        return None
+
+    # 2. Crear conversación con el contact_id
+    conv_url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations"
+    conv_payload = {
         "inbox_id": int(INBOX_ID),
-        "contact": {
-            "name": f"Cliente {phone_number}",
-            "phone_number": phone_number,
-            "identifier": phone_number  # ✅ OBLIGATORIO
-        }
+        "contact_id": contact_id
     }
 
-    response = requests.post(url, json=payload, headers=headers)
-
-    if response.status_code in [200, 201]:
-        conversation_id = response.json()["id"]
-        print(f"✅ Conversación Chatwoot ID {conversation_id} obtenida/creada para {phone_number}")
-        return conversation_id
-    else:
-        print(f"❌ Error al obtener/crear conversación: {response.status_code} {response.text}")
+    try:
+        response = requests.post(conv_url, json=conv_payload, headers=headers)
+        if response.status_code in [200, 201]:
+            conversation_id = response.json()["id"]
+            print(f"✅ Conversación creada: {conversation_id}")
+            return conversation_id
+        else:
+            print(f"❌ Error creando conversación: {response.status_code} {response.text}")
+            return None
+    except Exception as e:
+        print(f"❌ Excepción al crear conversación: {e}")
         return None
 
 def enviar_mensaje(conversation_id, mensaje):
