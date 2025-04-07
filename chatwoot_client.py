@@ -52,30 +52,48 @@ def obtener_o_crear_conversacion(phone_number):
         "client": token["client"]
     }
 
-    # 1. Crear el contacto
-    contact_url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/contacts"
-    contact_payload = {
-        "name": f"Cliente {phone_number}",
-        "phone_number": f"+{phone_number}",
-        "identifier": f"+{phone_number}"
-    }
+    formatted_phone = f"+{phone_number}"
 
+    # 1. Buscar contacto existente
+    search_url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/contacts/search?q={formatted_phone}"
     try:
-        response = requests.post(contact_url, json=contact_payload, headers=headers)
-        data = response.json()
-        contact_id = data.get("id")
-
-        if not contact_id:
-            print(f"❌ Error creando contacto: {response.status_code} {response.text}")
+        search_response = requests.get(search_url, headers=headers)
+        if search_response.ok:
+            results = search_response.json().get("payload", [])
+            if results:
+                contact_id = results[0]["id"]
+                print(f"🔍 Contacto existente encontrado: {contact_id}")
+            else:
+                contact_id = None
+        else:
+            print(f"❌ Error buscando contacto: {search_response.status_code} {search_response.text}")
             return None
-
-        print(f"✅ Contacto creado con ID: {contact_id}")
-
     except Exception as e:
-        print(f"❌ Excepción al crear contacto: {e}")
+        print(f"❌ Excepción buscando contacto: {e}")
         return None
 
-    # 2. Crear la conversación
+    # 2. Si no existe, crear contacto
+    if not contact_id:
+        contact_url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/contacts"
+        contact_payload = {
+            "name": f"Cliente {phone_number}",
+            "phone_number": formatted_phone,
+            "identifier": formatted_phone
+        }
+
+        try:
+            response = requests.post(contact_url, json=contact_payload, headers=headers)
+            if response.ok:
+                contact_id = response.json()["id"]
+                print(f"✅ Contacto creado: {contact_id}")
+            else:
+                print(f"❌ Error creando contacto: {response.status_code} {response.text}")
+                return None
+        except Exception as e:
+            print(f"❌ Excepción al crear contacto: {e}")
+            return None
+
+    # 3. Crear conversación
     conv_url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations"
     conv_payload = {
         "inbox_id": int(INBOX_ID),
@@ -84,10 +102,8 @@ def obtener_o_crear_conversacion(phone_number):
 
     try:
         response = requests.post(conv_url, json=conv_payload, headers=headers)
-        data = response.json()
-
-        if response.status_code in [200, 201] and "id" in data:
-            conversation_id = data["id"]
+        if response.ok:
+            conversation_id = response.json()["id"]
             print(f"✅ Conversación creada: {conversation_id}")
             return conversation_id
         else:
