@@ -139,7 +139,7 @@ def webhook():
             if respuesta:
                 enviar_respuesta(remitente, respuesta)
 
-                from client_chatwoot import obtener_o_crear_conversacion, enviar_mensaje
+                from chatwoot_client import obtener_o_crear_conversacion, enviar_mensaje
                 conversation_id = obtener_o_crear_conversacion(remitente)
                 if conversation_id:
                     enviar_mensaje(conversation_id, respuesta)
