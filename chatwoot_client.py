@@ -42,12 +42,19 @@ def obtener_token_temporal():
 
 def obtener_contacto_id(phone_number, headers):
     list_url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/contacts"
-    response = requests.get(list_url, headers=headers)
-    if response.ok:
-        for contact in response.json():
-            if contact["identifier"] == f"+{phone_number}":
-                print(f"🔍 Contacto existente encontrado: {contact['id']}")
-                return contact["id"]
+response = requests.get(contact_check_url, headers=headers)
+if response.ok:
+    data = response.json()
+    
+    contactos = data.get("payload", data)  # si viene dentro de 'payload', usalo; si no, asumimos lista directa
+    
+    print(f"📦 Datos de contacto recibidos: {contactos}")
+
+    for contact in contactos:
+        if isinstance(contact, dict) and contact.get("identifier") == f"+{phone_number}":
+            print(f"🔍 Contacto existente encontrado: {contact['id']}")
+            return contact["id"]
+
     # Crear contacto si no existe
     contact_url = f"{CHATWOOT_URL}/api/v1/accounts/{ACCOUNT_ID}/contacts"
     contact_payload = {
