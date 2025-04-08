@@ -114,55 +114,44 @@ def webhook():
             print("❌ Falló la verificación del webhook con Meta.")
             return "Error de verificación", 403
 
-    # ✅ Nueva validación
-    json_data = request.get_json(silent=True)
-    if not json_data or "entry" not in json_data:
-        print("🔁 Webhook no es de WhatsApp. Ignorado.")
-        return "Ignored", 200
+    try:
+        raw_data = request.data
+        json_data = request.get_json(silent=True)
 
-    print("📩 Se recibió un POST en /webhook")
-    sys.stdout.flush()
-
-try:
-    raw_data = request.data
-    json_data = request.get_json(silent=True)
-
-    print(f"📩 JSON recibido: {json_data}")
-    sys.stdout.flush()
-
-    # Asegurar que sea un mensaje válido de WhatsApp
-    if not json_data or "entry" not in json_data:
-        print("🔁 Webhook no es de WhatsApp o faltan datos clave. Ignorado.")
-        return "OK", 200
-
-    value = json_data["entry"][0]["changes"][0]["value"]
-
-    if "messages" in value:
-        mensaje = value["messages"][0]["text"]["body"]
-        remitente = value["messages"][0]["from"]
-
-        print(f"📩 Mensaje recibido: {mensaje} de {remitente}")
+        print(f"📩 JSON recibido: {json_data}")
         sys.stdout.flush()
 
-        respuesta = responder_mensaje(remitente, mensaje)
+        if not json_data or "entry" not in json_data:
+            print("🔁 Webhook no es de WhatsApp o faltan datos clave. Ignorado.")
+            return "OK", 200
 
-        if respuesta:
-            enviar_respuesta(remitente, respuesta)
+        value = json_data["entry"][0]["changes"][0]["value"]
 
-            # 🔁 Enviar también a Chatwoot
-            from client_chatwoot import obtener_o_crear_conversacion, enviar_mensaje
-            conversation_id = obtener_o_crear_conversacion(remitente)
-            if conversation_id:
-                enviar_mensaje(conversation_id, respuesta)
+        if "messages" in value:
+            mensaje = value["messages"][0]["text"]["body"]
+            remitente = value["messages"][0]["from"]
 
-    return "OK", 200
+            print(f"📩 Mensaje recibido: {mensaje} de {remitente}")
+            sys.stdout.flush()
 
-except Exception as e:
-    import traceback
-    print("❌ Error al procesar la solicitud:")
-    traceback.print_exc()
-    sys.stdout.flush()
-    return "Error", 500
+            respuesta = responder_mensaje(remitente, mensaje)
+
+            if respuesta:
+                enviar_respuesta(remitente, respuesta)
+
+                from client_chatwoot import obtener_o_crear_conversacion, enviar_mensaje
+                conversation_id = obtener_o_crear_conversacion(remitente)
+                if conversation_id:
+                    enviar_mensaje(conversation_id, respuesta)
+
+        return "OK", 200
+
+    except Exception as e:
+        import traceback
+        print("❌ Error al procesar la solicitud:")
+        traceback.print_exc()
+        sys.stdout.flush()
+        return "Error", 500
     
 def enviar_respuesta(numero, mensaje):
     time.sleep(2)
