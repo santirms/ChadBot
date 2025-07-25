@@ -102,10 +102,14 @@ def responder_mensaje(remitente, mensaje):
 @app.route("/webhook", methods=["GET", "POST"])
 def webhook():
     if request.method == "GET":
-        # Verificación de webhook desde Meta
+        # Verificación del webhook desde Meta
         mode = request.args.get("hub.mode")
         token = request.args.get("hub.verify_token")
         challenge = request.args.get("hub.challenge")
+
+        print("📩 GET recibido para verificación")
+        print(f"Modo: {mode}, Token recibido: {token}, Token esperado: {VERIFY_TOKEN}, Challenge: {challenge}")
+        sys.stdout.flush()
 
         if mode == "subscribe" and token == VERIFY_TOKEN:
             print("✅ Webhook verificado correctamente con Meta.")
@@ -114,6 +118,7 @@ def webhook():
             print("❌ Falló la verificación del webhook con Meta.")
             return "Error de verificación", 403
 
+    # POST: mensajes reales desde WhatsApp
     try:
         raw_data = request.data
         json_data = request.get_json(silent=True)
@@ -195,22 +200,7 @@ def test_chatwoot():
         else:
             return f"❌ Error {response.status_code}: {response.text}", response.status_code
     except Exception as e:
-        return f"❌ Excepción: {str(e)}", 500
-        
-@app.route("/webhook", methods=["GET"])
-def verificar_webhook():
-    mode = request.args.get("hub.mode")
-    token = request.args.get("hub.verify_token")
-    challenge = request.args.get("hub.challenge")
-
-    print("📩 GET recibido para verificación")
-    print(f"Modo: {mode}, Token: {token}, Challenge: {challenge}")
-    sys.stdout.flush()
-
-    if mode == "subscribe" and token == VERIFY_TOKEN:
-        return challenge, 200
-    else:
-        return "❌ Verificación fallida", 403
+        return f"❌ Excepción: {str(e)}", 500    
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
