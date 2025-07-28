@@ -12,7 +12,7 @@ for key, value in os.environ.items():
     if "CHATWOOT" in key:
         print(f"{key} = {value}")
         
-print("🔒 VERIFY_TOKEN =", repr(os.environ.get("VERIFY_TOKEN")))
+#print("🔒 VERIFY_TOKEN =", repr(os.environ.get("VERIFY_TOKEN")))
 
 app = Flask(__name__)
 
@@ -23,7 +23,7 @@ TIENDA_NUBE_API_URL = f"https://api.tiendanube.com/v1/{TIENDA_NUBE_STORE_ID}/pro
 
 # Credenciales de WhatsApp Cloud API
 WHATSAPP_TOKEN = os.environ.get("WHATSAPP_TOKEN")
-VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN")
+VERIFY_TOKEN = "mi-token-de-verificacion"  # sin tilde
 
 # Clientes en espera de atención humana
 clientes_en_espera = set()
